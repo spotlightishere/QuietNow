@@ -8,7 +8,6 @@
 import AVFoundation
 import AVKit
 import Foundation
-import UIKit
 
 enum PlaybackError: Error {
     case songNotFound
@@ -26,9 +25,6 @@ enum PlaybackError: Error {
 
 /// Our global storage, used within tap callbacks.
 var tapMetadata = TapMetadata()
-
-let viewController = AVPlayerViewController()
-var audioPlayer: AVPlayer?
 
 // Via tap callbacks, we can glean information about the track
 // and apply our audio unit accordingly.
@@ -91,7 +87,7 @@ enum TapLifecycle {
     }
 }
 
-func playExample() throws {
+func createExampleItem() async throws -> AVPlayerItem {
     // TODO: Something something streaming, configuration
     guard let songLocation = Bundle.main.url(forResource: "Drugstore Perfume", withExtension: "mp3") else {
         throw PlaybackError.songNotFound
@@ -99,7 +95,7 @@ func playExample() throws {
 
     // Let's load the asset, and find the first track that's audio.
     let audioAsset = AVAsset(url: songLocation)
-    guard let audioTrack = audioAsset.tracks(withMediaType: .audio).first else {
+    guard let audioTrack = try await audioAsset.loadTracks(withMediaType: .audio).first else {
         throw PlaybackError.songNotFound
     }
 
@@ -126,13 +122,8 @@ func playExample() throws {
     mixInputParameters.audioTapProcessor = audioTap?.takeRetainedValue()
     audioMix.inputParameters = [mixInputParameters]
 
-    // Lastly, create an audio player, and go wild.
+    // This AVPlayerItem utilizes our custom mix, and thus is suitable for playback.
     let audioItem = AVPlayerItem(asset: audioAsset)
     audioItem.audioMix = audioMix
-
-    audioPlayer = AVPlayer(playerItem: audioItem)
-    viewController.player = audioPlayer
-    UIApplication.shared.keyWindow?.rootViewController?.navigationController?.pushViewController(viewController, animated: true)
-    audioPlayer!.play()
-    print("Playing...")
+    return audioItem
 }

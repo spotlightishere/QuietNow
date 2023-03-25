@@ -5,17 +5,24 @@
 //  Created by Spotlight Deveaux on 2023-03-23.
 //
 
+import AVKit
 import SwiftUI
 
 struct ContentView: View {
+    @State var audioPlayer: AVPlayer = .init()
+
     var body: some View {
         VStack {
             Text("Hello, world!")
                 .onAppear {
-                    do {
-                        try playExample()
-                    } catch let e {
-                        print(e)
+                    Task {
+                        do {
+                            let audioItem = try await createExampleItem()
+                            audioPlayer.replaceCurrentItem(with: audioItem)
+                            audioPlayer.play()
+                        } catch let e {
+                            print(e)
+                        }
                     }
                 }
         }

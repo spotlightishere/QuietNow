@@ -78,12 +78,16 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     var audioInputFunc = AURenderCallbackStruct(inputProc: audioInputCallback, inputProcRefCon: Unmanaged.passUnretained(tap).toOpaque())
     try audioUnit.setProperty(property: kAudioUnitProperty_SetRenderCallback, scope: .input, data: &audioInputFunc, dataSize: renderCallbackSize)
 
-    // Lastly, specify models...
-    // These are really under
-    //
-    // TODO: This should be a configurable location under macOS,
-    // perhaps defaulting to loading from the iOS Simulator runtime.
-    let modelDirectory = URL(filePath: "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
+    // Lastly, specify models locations.
+    #if os(macOS)
+        // TODO: This should be a configurable location,
+        // perhaps defaulting to loading from the iOS Simulator runtime.
+        let modelDirectory = URL(filePath: "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
+    #else
+        // We will rely on the location of MediaPlaybackCore.framework.
+        // While we should likely look up its bundle by identifier, hardcoding will suffice for now.
+        let modelDirectory = URL(filePath: "/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
+    #endif
 
     // XXX: 30000 is plist path
     var plistPath = modelDirectory.appending(component: "aufx-nnet-appl.plist").path() as CFString

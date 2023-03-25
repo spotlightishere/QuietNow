@@ -22,6 +22,12 @@ func AudioComponentInstanceNew(_ component: AudioComponent) throws -> AudioCompo
     return componentInstance!
 }
 
+extension AudioUnitScope {
+    static let global = kAudioUnitScope_Global
+    static let input = kAudioUnitScope_Input
+    static let output = kAudioUnitScope_Output
+}
+
 extension AudioComponentInstance {
     func initialize() throws {
         try AudioUnitInitialize(self).audioSuccess()
@@ -34,5 +40,9 @@ extension AudioComponentInstance {
     func setProperty(property: AudioUnitPropertyID, scope: AudioUnitScope, data: UnsafeRawPointer?, dataSize: UInt32) throws {
         // Here, we assume element will always be zero.
         try AudioUnitSetProperty(self, property, scope, 0, data, dataSize).audioSuccess()
+    }
+    
+    func setParameter(parameter: AudioUnitParameterID, scope: AudioUnitScope, value: AudioUnitParameterValue, offset: UInt32) throws {
+        try AudioUnitSetParameter(self, parameter, scope, 0, value, offset).audioSuccess()
     }
 }

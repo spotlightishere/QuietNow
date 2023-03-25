@@ -24,6 +24,7 @@ func createVocalIsolationUnit(with tap: MTAudioProcessingTap) -> AudioUnit {
 let uint32DataSize = UInt32(MemoryLayout<UInt32>.size)
 let formatDescSize = UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
 let renderCallbackSize = UInt32(MemoryLayout<AURenderCallbackStruct>.size)
+let stringPointerSize = UInt32(MemoryLayout<CFString>.size)
 
 /// Creates the custom vocal isolation audio unit.
 func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
@@ -46,14 +47,21 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     let audioUnit = try AudioComponentInstanceNew(audioComponent)
 
     // We'll need to set a few properties...
-    var metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(tap), to: TapMetadata.self)
+    let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(tap), to: TapMetadata.self)
 
     // First, we learned the stream format and maximum frame count from the tap.
     // We can set those as properties on our audio unit.
-    try audioUnit.setProperty(property: kAudioUnitProperty_MaximumFramesPerSlice, scope: kAudioUnitScope_Input, data: &metadata.maxFrameCount, dataSize: uint32DataSize)
+    try audioUnit.setProperty(property: kAudioUnitProperty_MaximumFramesPerSlice, scope: .global, data: &metadata.maxFrameCount, dataSize: uint32DataSize)
     // For stream format, this should apply to both our input and output.
-    try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: kAudioUnitScope_Input, data: metadata.processingFormat, dataSize: formatDescSize)
-    try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: kAudioUnitScope_Output, data: metadata.processingFormat, dataSize: formatDescSize)
+    try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .input, data: metadata.processingFormat, dataSize: formatDescSize)
+    try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .output, data: metadata.processingFormat, dataSize: formatDescSize)
+        
+    // XXX: Denosing off? Default seems to be 1.0
+    // try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 0.0, offset: 0)
+    // XXX: Tuning mode?
+    try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
+    // XXX: Attenuation level?
+    // try audioUnit.setParameter(parameter: 0, scope: .global, value: 0.35, offset: 0)
 
     // Next, we'll need to create a render callback to give audio input.
     let audioInputCallback: AURenderCallback = { inputRef, _, _, _, frameCount, dataBuffer -> OSStatus in
@@ -68,10 +76,24 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
         return MTAudioProcessingTapGetSourceAudio(passedTap, CMItemCount(frameCount), dataBuffer!, nil, nil, nil)
     }
     var audioInputFunc = AURenderCallbackStruct(inputProc: audioInputCallback, inputProcRefCon: Unmanaged.passUnretained(tap).toOpaque())
-    try audioUnit.setProperty(property: kAudioUnitProperty_SetRenderCallback, scope: kAudioUnitScope_Input, data: &audioInputFunc, dataSize: UInt32(MemoryLayout<AURenderCallbackStruct>.size))
+    try audioUnit.setProperty(property: kAudioUnitProperty_SetRenderCallback, scope: .input, data: &audioInputFunc, dataSize: renderCallbackSize)
 
     // Lastly, specify models...(?)
-    // TODO: properties 30000, 40000, 50000
+    // TODO: This should be a configurable location under macOS,
+    // perhaps defaulting to loading from the iOS Simulator runtime.
+    let modelDirectory = URL(filePath: "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
+    
+    // XXX: 30000 is plist path
+    var plistPath = modelDirectory.appending(component: "aufx-nnet-appl.plist").path() as CFString
+    try audioUnit.setProperty(property: 30000, scope: .global, data: &plistPath, dataSize: stringPointerSize)
+    
+    // XXX: 40000 is model base path
+    var modelBasePath = modelDirectory.path() as CFString
+    try audioUnit.setProperty(property: 40000, scope: .global, data: &modelBasePath, dataSize: stringPointerSize)
+    
+    // XXX: 50000 disables dereverb
+    // TODO: Apple seems to set it to a blank string - why?
+    // If we do that, it crashes. That probably isn't right - what should go there?
     
     try audioUnit.initialize()
     return audioUnit

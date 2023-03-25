@@ -41,7 +41,7 @@ extension AudioComponentInstance {
         // Here, we assume element will always be zero.
         try AudioUnitSetProperty(self, property, scope, 0, data, dataSize).audioSuccess()
     }
-    
+
     func setParameter(parameter: AudioUnitParameterID, scope: AudioUnitScope, value: AudioUnitParameterValue, offset: UInt32) throws {
         try AudioUnitSetParameter(self, parameter, scope, 0, value, offset).audioSuccess()
     }

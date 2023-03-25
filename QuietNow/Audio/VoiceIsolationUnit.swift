@@ -31,10 +31,10 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     // Attempt to find the voice isolation audio component.
     //  - Manufacturer: Apple
     //  - Type: Effect
-    //  - Subtype: Voice Isolation ('vois')
+    //  - Subtype: Sound/Voice Isolation ('vois')
     var searchDescription = AudioComponentDescription(
         componentType: kAudioUnitType_Effect,
-        componentSubType: OSType(0x766F_6973), // vois
+        componentSubType: kAudioUnitSubType_AUSoundIsolation,
         componentManufacturer: kAudioUnitManufacturer_Apple,
         componentFlags: 0,
         componentFlagsMask: 0
@@ -55,13 +55,13 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     // For stream format, this should apply to both our input and output.
     try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .input, data: metadata.processingFormat, dataSize: formatDescSize)
     try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .output, data: metadata.processingFormat, dataSize: formatDescSize)
-        
+
     // XXX: Denosing off? Default seems to be 1.0
-    // try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 0.0, offset: 0)
+    try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 0.0, offset: 0)
     // XXX: Tuning mode?
     try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
     // XXX: Attenuation level?
-    // try audioUnit.setParameter(parameter: 0, scope: .global, value: 0.35, offset: 0)
+    // try audioUnit.setParameter(parameter: 0, scope: .global, value: 0.0, offset: 0)
 
     // Next, we'll need to create a render callback to give audio input.
     let audioInputCallback: AURenderCallback = { inputRef, _, _, _, frameCount, dataBuffer -> OSStatus in
@@ -78,23 +78,26 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     var audioInputFunc = AURenderCallbackStruct(inputProc: audioInputCallback, inputProcRefCon: Unmanaged.passUnretained(tap).toOpaque())
     try audioUnit.setProperty(property: kAudioUnitProperty_SetRenderCallback, scope: .input, data: &audioInputFunc, dataSize: renderCallbackSize)
 
-    // Lastly, specify models...(?)
+    // Lastly, specify models...
+    // These are really under
+    //
     // TODO: This should be a configurable location under macOS,
     // perhaps defaulting to loading from the iOS Simulator runtime.
     let modelDirectory = URL(filePath: "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime/Contents/Resources/RuntimeRoot/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
-    
+
     // XXX: 30000 is plist path
     var plistPath = modelDirectory.appending(component: "aufx-nnet-appl.plist").path() as CFString
     try audioUnit.setProperty(property: 30000, scope: .global, data: &plistPath, dataSize: stringPointerSize)
-    
+
     // XXX: 40000 is model base path
     var modelBasePath = modelDirectory.path() as CFString
     try audioUnit.setProperty(property: 40000, scope: .global, data: &modelBasePath, dataSize: stringPointerSize)
-    
+
     // XXX: 50000 disables dereverb
-    // TODO: Apple seems to set it to a blank string - why?
-    // If we do that, it crashes. That probably isn't right - what should go there?
-    
+    // TODO: This seems to disable a neural network for dereverb - how is it used? Why?
+    var dereverbModelPath = "" as CFString
+    try audioUnit.setProperty(property: 50000, scope: .global, data: &dereverbModelPath, dataSize: stringPointerSize)
+
     try audioUnit.initialize()
     return audioUnit
 }

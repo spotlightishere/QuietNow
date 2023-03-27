@@ -10,8 +10,8 @@ import SwiftUI
 @main
 struct QuietNowApp: App {
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        DocumentGroup(viewing: TrackDocument.self) { loadedFile in
+            PlayerView(file: loadedFile.document)
         }
         #if os(macOS)
         .windowResizability(.contentSize)

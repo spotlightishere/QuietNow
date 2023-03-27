@@ -14,22 +14,14 @@ class PlayingTrack: ObservableObject {
     public var artist = "-"
     public var album = "-"
     public var artwork = Image(systemName: "music.quarternote.3")
-    public var playerItem: AVPlayerItem? = nil
-    private var audioMix: AVAudioMix?
+    public var playerItem: AVPlayerItem
+    private var audioMix: AVAudioMix
 
-    init() {
-        title = "Not playing"
-        album = "Drag and drop a file"
-        artist = "to get started"
-    }
-
-    init(with item: URL) async throws {
-        let asset = AVAsset(url: item)
-
+    init(with asset: AVAsset) async throws {
         // Applying this audio mix allows us to leverage the audio unit throughout playback.
         audioMix = try await createAudioMix(for: asset)
         playerItem = AVPlayerItem(asset: asset)
-        playerItem!.audioMix = audioMix!
+        playerItem.audioMix = audioMix
 
         // Attempt to fill in metadata if it is available.
         let assetMetadata = try await asset.load(.commonMetadata)
@@ -62,17 +54,12 @@ class PlayingTrack: ObservableObject {
     /// - Parameter attenuationLevel: The desired level.
     /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
     func adjust(attenuationLevel: Float32) {
-        guard let audioMix else {
-            // Likely, nothing is playing.
-            return
-        }
-
         let currentTap = audioMix.inputParameters.first!.audioTapProcessor!
         let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(currentTap), to: TapMetadata.self)
         let audioUnit = metadata.audioUnit!
         do {
             try audioUnit.setParameter(parameter: 0, scope: .global, value: attenuationLevel, offset: 0)
-            print(attenuationLevel)
+            print("Attenuation level is now \(attenuationLevel)")
         } catch let e {
             print("Error adjusting vocal attenuation level: \(e)")
         }
@@ -85,14 +72,9 @@ class PlayingTrack: ObservableObject {
             return
         }
 
-        guard let playerItem else {
-            throw PlaybackError.exportFailed
-        }
-
         let asset = playerItem.asset
         let exportAudioMix = try await createAudioMix(for: asset)
 
-        // We'll export this as an M4A
         guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
             throw PlaybackError.exportFailed
         }

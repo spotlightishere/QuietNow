@@ -91,7 +91,8 @@ enum TapLifecycle {
 
 func createAudioMix(for audioAsset: AVAsset) async throws -> AVAudioMix {
     // Let's find the first track that's audio.
-    guard let audioTrack = try await audioAsset.loadTracks(withMediaType: .audio).first else {
+    let availableTracks = try await audioAsset.loadTracks(withMediaType: .audio)
+    guard let audioTrack = availableTracks.first else {
         throw PlaybackError.songNotFound
     }
 

@@ -9,11 +9,13 @@
 /* Begin PBXBuildFile section */
 		42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7529CEBD8800897F96 /* VoiceIsolationUnit.swift */; };
 		42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */; };
+		426639E729D1FB3C00674DD6 /* TrackDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E629D1FB3C00674DD6 /* TrackDocument.swift */; };
+		426639E929D237DF00674DD6 /* AVIngressDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E829D237DF00674DD6 /* AVIngressDelegate.swift */; };
 		42C3B63129CFCA7F002887B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 42C3B63029CFCA7F002887B5 /* README.md */; };
 		42C3B63329D09571002887B5 /* PlayingTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63229D09571002887B5 /* PlayingTrack.swift */; };
 		42C3B63529D10EA2002887B5 /* AgnosticUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63429D10EA2002887B5 /* AgnosticUI.swift */; };
 		42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */; };
-		42E1423D29CCB6A500FD8B07 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1423C29CCB6A500FD8B07 /* ContentView.swift */; };
+		42E1423D29CCB6A500FD8B07 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1423C29CCB6A500FD8B07 /* PlayerView.swift */; };
 		42E1423F29CCB6A700FD8B07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42E1423E29CCB6A700FD8B07 /* Assets.xcassets */; };
 		42E1424929CCB6CD00FD8B07 /* TapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1424829CCB6CD00FD8B07 /* TapManager.swift */; };
 		42E1425029CCB85300FD8B07 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E1424F29CCB85200FD8B07 /* MediaPlayer.framework */; };
@@ -23,12 +25,14 @@
 /* Begin PBXFileReference section */
 		42398C7529CEBD8800897F96 /* VoiceIsolationUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceIsolationUnit.swift; sourceTree = "<group>"; };
 		42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitWrapper.swift; sourceTree = "<group>"; };
+		426639E629D1FB3C00674DD6 /* TrackDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDocument.swift; sourceTree = "<group>"; };
+		426639E829D237DF00674DD6 /* AVIngressDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIngressDelegate.swift; sourceTree = "<group>"; };
 		42C3B63029CFCA7F002887B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		42C3B63229D09571002887B5 /* PlayingTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingTrack.swift; sourceTree = "<group>"; };
 		42C3B63429D10EA2002887B5 /* AgnosticUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgnosticUI.swift; sourceTree = "<group>"; };
 		42E1423729CCB6A500FD8B07 /* QuietNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuietNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietNowApp.swift; sourceTree = "<group>"; };
-		42E1423C29CCB6A500FD8B07 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		42E1423C29CCB6A500FD8B07 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		42E1423E29CCB6A700FD8B07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42E1424829CCB6CD00FD8B07 /* TapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapManager.swift; sourceTree = "<group>"; };
 		42E1424F29CCB85200FD8B07 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
@@ -52,6 +56,7 @@
 		42398C7729CEBD9700897F96 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				426639E829D237DF00674DD6 /* AVIngressDelegate.swift */,
 				42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */,
 				42E1424829CCB6CD00FD8B07 /* TapManager.swift */,
 				42398C7529CEBD8800897F96 /* VoiceIsolationUnit.swift */,
@@ -84,8 +89,9 @@
 				42E1425329CCB8F400FD8B07 /* QuietNow.entitlements */,
 				42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */,
 				42C3B63429D10EA2002887B5 /* AgnosticUI.swift */,
+				42E1423C29CCB6A500FD8B07 /* PlayerView.swift */,
 				42C3B63229D09571002887B5 /* PlayingTrack.swift */,
-				42E1423C29CCB6A500FD8B07 /* ContentView.swift */,
+				426639E629D1FB3C00674DD6 /* TrackDocument.swift */,
 				42E1423E29CCB6A700FD8B07 /* Assets.xcassets */,
 			);
 			path = QuietNow;
@@ -175,12 +181,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				42E1424929CCB6CD00FD8B07 /* TapManager.swift in Sources */,
-				42E1423D29CCB6A500FD8B07 /* ContentView.swift in Sources */,
+				42E1423D29CCB6A500FD8B07 /* PlayerView.swift in Sources */,
+				426639E729D1FB3C00674DD6 /* TrackDocument.swift in Sources */,
 				42C3B63329D09571002887B5 /* PlayingTrack.swift in Sources */,
 				42C3B63529D10EA2002887B5 /* AgnosticUI.swift in Sources */,
 				42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */,
 				42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */,
 				42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */,
+				426639E929D237DF00674DD6 /* AVIngressDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

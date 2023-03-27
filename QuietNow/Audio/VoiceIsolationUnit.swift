@@ -56,12 +56,12 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .input, data: metadata.processingFormat, dataSize: formatDescSize)
     try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .output, data: metadata.processingFormat, dataSize: formatDescSize)
 
-    // XXX: Denosing off? Default seems to be 1.0
+    // XXX: Denosing off. Default seems to be 1.0
     try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 1.0, offset: 0)
-    // XXX: Tuning mode?
+    // XXX: Tuning mode
     try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
-    // XXX: Attenuation level?
-    try audioUnit.setParameter(parameter: 0, scope: .global, value: 85.0, offset: 0)
+    // XXX: Attenuation level - referred to as "wet/dry mix percent"
+    try audioUnit.setParameter(parameter: kAUSoundIsolationParam_WetDryMixPercent, scope: .global, value: 85.0, offset: 0)
 
     // Next, we'll need to create a render callback to give audio input.
     let audioInputCallback: AURenderCallback = { inputRef, _, _, _, frameCount, dataBuffer -> OSStatus in

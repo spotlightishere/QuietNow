@@ -14,6 +14,7 @@ enum PlaybackError: Error {
     case metadataLoadError
     case audioUnitNotFound
     case audioUnitError(OSStatus)
+    case exportFailed
 }
 
 /// Values within tap metadata are passed around throughout tap callbacks.
@@ -88,9 +89,8 @@ enum TapLifecycle {
     }
 }
 
-func createAudioMix(for songLocation: URL) async throws -> AVAudioMix {
-    // Let's load the asset, and find the first track that's audio.
-    let audioAsset = AVAsset(url: songLocation)
+func createAudioMix(for audioAsset: AVAsset) async throws -> AVAudioMix {
+    // Let's find the first track that's audio.
     guard let audioTrack = try await audioAsset.loadTracks(withMediaType: .audio).first else {
         throw PlaybackError.songNotFound
     }

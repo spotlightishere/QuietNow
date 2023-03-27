@@ -27,7 +27,7 @@ class PlayingTrack: ObservableObject {
         let asset = AVAsset(url: item)
 
         // Applying this audio mix allows us to leverage the audio unit throughout playback.
-        audioMix = try await createAudioMix(for: item)
+        audioMix = try await createAudioMix(for: asset)
         playerItem = AVPlayerItem(asset: asset)
         playerItem!.audioMix = audioMix!
 
@@ -57,7 +57,7 @@ class PlayingTrack: ObservableObject {
             }
         }
     }
-    
+
     /// Adjusts the vocal attenuation level for the currently playing item.
     /// - Parameter attenuationLevel: The desired level.
     /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
@@ -76,5 +76,43 @@ class PlayingTrack: ObservableObject {
         } catch let e {
             print("Error adjusting vocal attenuation level: \(e)")
         }
+    }
+
+    func export(progress currentProgress: Binding<Float>) async throws {
+        // Prompt the user to select where to export.
+        let userLocation = await DialogHandler().fileSaveDialog()
+        guard let playerItem else {
+            throw PlaybackError.exportFailed
+        }
+
+        let asset = playerItem.asset
+        let exportAudioMix = try await createAudioMix(for: asset)
+
+        // We'll export this as an M4A
+        guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
+            throw PlaybackError.exportFailed
+        }
+        exportSession.audioMix = exportAudioMix
+        exportSession.outputURL = userLocation
+        exportSession.outputFileType = .m4a
+
+        let exportTimer = Timer(timeInterval: 0.5, repeats: true) { currentTimer in
+            switch exportSession.status {
+            case .exporting:
+                currentProgress.wrappedValue = exportSession.progress
+            case .failed, .cancelled:
+                print("Error occurred whilst exporting: \(exportSession.error?.localizedDescription ?? "Empty error")")
+                currentProgress.wrappedValue = 0.0
+                currentTimer.invalidate()
+            case .completed:
+                print("Export complete.")
+                currentProgress.wrappedValue = 0.0
+                currentTimer.invalidate()
+            default:
+                print("Export session in state \(exportSession.status)")
+            }
+        }
+        RunLoop.main.add(exportTimer, forMode: .common)
+        await exportSession.export()
     }
 }

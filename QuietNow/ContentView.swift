@@ -12,6 +12,7 @@ struct ContentView: View {
     let audioPlayer = AVPlayer()
     @State var currentTrack = PlayingTrack()
     @State var vocalLevel: Float32 = 85.0
+    @State var exportProgress: Float = 0.0
 
     var body: some View {
         VStack {
@@ -38,6 +39,20 @@ struct ContentView: View {
                 Text("Attenuation:")
             } onEditingChanged: { _ in
                 currentTrack.adjust(attenuationLevel: vocalLevel)
+            }
+
+            // We'd also like an export button.
+            Button("Export... \(exportProgress)") {
+                Task {
+                    do {
+                        try await currentTrack.export(progress: $exportProgress)
+                    } catch let e {
+                        print("Exception while exporting: \(e)")
+                    }
+                }
+            }.disabled(currentTrack.playerItem == nil)
+            if exportProgress != 0.0 {
+                ProgressView(value: exportProgress)
             }
         }
         .padding()

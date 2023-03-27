@@ -24,9 +24,6 @@ enum PlaybackError: Error {
     var sampleCount: Float64 = 0.0
 }
 
-/// Our global storage, used within tap callbacks.
-var tapMetadata = TapMetadata()
-
 // Via tap callbacks, we can glean information about the track
 // and apply our audio unit accordingly.
 //
@@ -34,13 +31,17 @@ var tapMetadata = TapMetadata()
 // https://developer.apple.com/library/ios/samplecode/AudioTapProcessor/Introduction/Intro.html
 // It is also very similar to that of MediaPlaybackCore.framework.
 enum TapLifecycle {
-    static let tapInitCallback: MTAudioProcessingTapInitCallback = { _, clientInfo, tapStorageOut in
-        // [... we have nothing to initialize, as we use the global TapMetadata variable ...]
-        tapStorageOut.pointee = clientInfo
+    // Within initialization, we hackily allocate our metadata type.
+    static let tapInitCallback: MTAudioProcessingTapInitCallback = { _, _, tapStorageOut in
+        let metadata = TapMetadata()
+        let storage = Unmanaged.passRetained(metadata)
+        tapStorageOut.pointee = storage.toOpaque()
     }
 
-    static let tapFinalizeCallback: MTAudioProcessingTapFinalizeCallback = { _ in
-        // [... we have nothing to clean up, probably. phew! ...]
+    // Within finalize, we must free our previously hackily-allocated metadata type.
+    static let tapFinalizeCallback: MTAudioProcessingTapFinalizeCallback = { currentTap in
+        let storage = MTAudioProcessingTapGetStorage(currentTap)
+        Unmanaged<TapMetadata>.fromOpaque(storage).release()
     }
 
     // Within prepare, we create our audio unit.
@@ -78,17 +79,16 @@ enum TapLifecycle {
         // And... we're off!
         do {
             try AudioUnitRender(metadata.audioUnit!, nil, &audioTimeStamp, 0, UInt32(frameCount), bufferList).audioSuccess()
+            // Keep track of how many frames we handled.
+            metadata.sampleCount += Double(frameCount)
+            frameCountOut.pointee = frameCount
         } catch let e {
             print("Error while rendering via audio unit: \(e)")
         }
-
-        // Keep track of how many frames we handled.
-        metadata.sampleCount += Double(frameCount)
-        frameCountOut.pointee = frameCount
     }
 }
 
-func createPlayerItem(for songLocation: URL) async throws -> AVPlayerItem {
+func createAudioMix(for songLocation: URL) async throws -> AVAudioMix {
     // Let's load the asset, and find the first track that's audio.
     let audioAsset = AVAsset(url: songLocation)
     guard let audioTrack = try await audioAsset.loadTracks(withMediaType: .audio).first else {
@@ -104,7 +104,7 @@ func createPlayerItem(for songLocation: URL) async throws -> AVPlayerItem {
     // Create the tap.
     var tapCallbacks = MTAudioProcessingTapCallbacks(
         version: kMTAudioProcessingTapCallbacksVersion_0,
-        clientInfo: Unmanaged.passUnretained(tapMetadata).toOpaque(),
+        clientInfo: nil,
         init: TapLifecycle.tapInitCallback,
         finalize: TapLifecycle.tapFinalizeCallback,
         prepare: TapLifecycle.tapPrepareCallback,
@@ -113,13 +113,14 @@ func createPlayerItem(for songLocation: URL) async throws -> AVPlayerItem {
     )
     var audioTap: Unmanaged<MTAudioProcessingTap>?
     try MTAudioProcessingTapCreate(kCFAllocatorDefault, &tapCallbacks, kMTAudioProcessingTapCreationFlag_PreEffects, &audioTap).audioSuccess()
+    guard let audioTap else {
+        throw PlaybackError.audioUnitNotFound
+    }
 
     // Now, apply it to the mix.
-    mixInputParameters.audioTapProcessor = audioTap?.takeRetainedValue()
+    mixInputParameters.audioTapProcessor = audioTap.takeRetainedValue()
     audioMix.inputParameters = [mixInputParameters]
 
     // This AVPlayerItem utilizes our custom mix, and thus is suitable for playback.
-    let audioItem = AVPlayerItem(asset: audioAsset)
-    audioItem.audioMix = audioMix
-    return audioItem
+    return audioMix
 }

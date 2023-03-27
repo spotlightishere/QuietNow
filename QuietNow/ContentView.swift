@@ -9,19 +9,24 @@ import AVKit
 import SwiftUI
 
 struct ContentView: View {
-    @State var audioPlayer: PlayerManager = .init()
+    let audioPlayer = AVPlayer()
+    @State var currentTrack = PlayingTrack()
 
     var body: some View {
         HStack {
-            audioPlayer.currentTrackInfo.trackArtwork
+            currentTrack.artwork
                 .fixedSize()
             VStack {
-                Text("\(audioPlayer.currentTrackInfo.trackTitle)")
-                Text("\(audioPlayer.currentTrackInfo.trackAlbum) \u{2014} \(audioPlayer.currentTrackInfo.trackArtist)")
+                Text("\(currentTrack.title)")
+                Text("\(currentTrack.album) \u{2014} \(currentTrack.artist)")
             }
         }
         .padding()
         .frame(width: 500.0, height: 300.0)
+        .onAppear {
+            // Begin playing as soon as possible.
+            audioPlayer.play()
+        }
         .onDrop(of: [.audio], isTargeted: nil) { items, _ in
             // We'll only utilize the first file.
             if items.count != 1 {
@@ -38,7 +43,9 @@ struct ContentView: View {
                         return
                     }
 
-                    try await audioPlayer.play(item: contents)
+                    let potentialTrack = try await PlayingTrack(with: contents)
+                    audioPlayer.replaceCurrentItem(with: potentialTrack.playerItem)
+                    currentTrack = potentialTrack
                 } catch let e {
                     print("Exception while playing: \(e)")
                 }

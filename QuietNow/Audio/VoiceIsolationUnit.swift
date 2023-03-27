@@ -61,7 +61,7 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     // XXX: Tuning mode?
     try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
     // XXX: Attenuation level?
-    // try audioUnit.setParameter(parameter: 0, scope: .global, value: 0.0, offset: 0)
+    try audioUnit.setParameter(parameter: 0, scope: .global, value: 85.0, offset: 0)
 
     // Next, we'll need to create a render callback to give audio input.
     let audioInputCallback: AURenderCallback = { inputRef, _, _, _, frameCount, dataBuffer -> OSStatus in

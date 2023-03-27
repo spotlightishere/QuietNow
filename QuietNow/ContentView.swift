@@ -65,6 +65,9 @@ struct ContentView: View {
                     let potentialTrack = try await PlayingTrack(with: contents)
                     audioPlayer.replaceCurrentItem(with: potentialTrack.playerItem)
                     audioPlayer.play()
+                    // We initialize the audio unit to be 85.0, and it
+                    // would be a pain to persist that, so we are simply not.
+                    vocalLevel = 85.0
                     currentTrack = potentialTrack
                 } catch let e {
                     print("Exception while playing: \(e)")

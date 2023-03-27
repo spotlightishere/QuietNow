@@ -13,5 +13,6 @@ struct QuietNowApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowResizability(.contentSize)
     }
 }

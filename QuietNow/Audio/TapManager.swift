@@ -11,6 +11,7 @@ import Foundation
 
 enum PlaybackError: Error {
     case songNotFound
+    case metadataLoadError
     case audioUnitNotFound
     case audioUnitError(OSStatus)
 }
@@ -87,12 +88,7 @@ enum TapLifecycle {
     }
 }
 
-func createExampleItem() async throws -> AVPlayerItem {
-    // TODO: Something something streaming, configuration
-    guard let songLocation = Bundle.main.url(forResource: "Drugstore Perfume", withExtension: "mp3") else {
-        throw PlaybackError.songNotFound
-    }
-
+func createPlayerItem(for songLocation: URL) async throws -> AVPlayerItem {
     // Let's load the asset, and find the first track that's audio.
     let audioAsset = AVAsset(url: songLocation)
     guard let audioTrack = try await audioAsset.loadTracks(withMediaType: .audio).first else {

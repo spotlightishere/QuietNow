@@ -9,11 +9,13 @@
 /* Begin PBXBuildFile section */
 		42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7529CEBD8800897F96 /* VoiceIsolationUnit.swift */; };
 		42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */; };
+		42C3B63129CFCA7F002887B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 42C3B63029CFCA7F002887B5 /* README.md */; };
+		42C3B63329D09571002887B5 /* PlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63229D09571002887B5 /* PlayerManager.swift */; };
+		42C3B63529D10EA2002887B5 /* AgnosticImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63429D10EA2002887B5 /* AgnosticImage.swift */; };
 		42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */; };
 		42E1423D29CCB6A500FD8B07 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1423C29CCB6A500FD8B07 /* ContentView.swift */; };
 		42E1423F29CCB6A700FD8B07 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42E1423E29CCB6A700FD8B07 /* Assets.xcassets */; };
 		42E1424929CCB6CD00FD8B07 /* TapManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42E1424829CCB6CD00FD8B07 /* TapManager.swift */; };
-		42E1424D29CCB7D200FD8B07 /* Drugstore Perfume.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 42E1424C29CCB7D200FD8B07 /* Drugstore Perfume.mp3 */; };
 		42E1425029CCB85300FD8B07 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E1424F29CCB85200FD8B07 /* MediaPlayer.framework */; };
 		42E1425229CCB89B00FD8B07 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 42E1425129CCB89B00FD8B07 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -21,12 +23,14 @@
 /* Begin PBXFileReference section */
 		42398C7529CEBD8800897F96 /* VoiceIsolationUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceIsolationUnit.swift; sourceTree = "<group>"; };
 		42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitWrapper.swift; sourceTree = "<group>"; };
+		42C3B63029CFCA7F002887B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		42C3B63229D09571002887B5 /* PlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManager.swift; sourceTree = "<group>"; };
+		42C3B63429D10EA2002887B5 /* AgnosticImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgnosticImage.swift; sourceTree = "<group>"; };
 		42E1423729CCB6A500FD8B07 /* QuietNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuietNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuietNowApp.swift; sourceTree = "<group>"; };
 		42E1423C29CCB6A500FD8B07 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		42E1423E29CCB6A700FD8B07 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		42E1424829CCB6CD00FD8B07 /* TapManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapManager.swift; sourceTree = "<group>"; };
-		42E1424C29CCB7D200FD8B07 /* Drugstore Perfume.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Drugstore Perfume.mp3"; sourceTree = "<group>"; };
 		42E1424F29CCB85200FD8B07 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		42E1425129CCB89B00FD8B07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		42E1425329CCB8F400FD8B07 /* QuietNow.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuietNow.entitlements; sourceTree = "<group>"; };
@@ -58,6 +62,7 @@
 		42E1422E29CCB6A500FD8B07 = {
 			isa = PBXGroup;
 			children = (
+				42C3B63029CFCA7F002887B5 /* README.md */,
 				42E1423929CCB6A500FD8B07 /* QuietNow */,
 				42E1423829CCB6A500FD8B07 /* Products */,
 				42E1424E29CCB85200FD8B07 /* Frameworks */,
@@ -78,9 +83,10 @@
 				42398C7729CEBD9700897F96 /* Audio */,
 				42E1425329CCB8F400FD8B07 /* QuietNow.entitlements */,
 				42E1423A29CCB6A500FD8B07 /* QuietNowApp.swift */,
+				42C3B63429D10EA2002887B5 /* AgnosticImage.swift */,
+				42C3B63229D09571002887B5 /* PlayerManager.swift */,
 				42E1423C29CCB6A500FD8B07 /* ContentView.swift */,
 				42E1423E29CCB6A700FD8B07 /* Assets.xcassets */,
-				42E1424C29CCB7D200FD8B07 /* Drugstore Perfume.mp3 */,
 			);
 			path = QuietNow;
 			sourceTree = "<group>";
@@ -156,8 +162,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42C3B63129CFCA7F002887B5 /* README.md in Resources */,
 				42E1423F29CCB6A700FD8B07 /* Assets.xcassets in Resources */,
-				42E1424D29CCB7D200FD8B07 /* Drugstore Perfume.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,6 +176,8 @@
 			files = (
 				42E1424929CCB6CD00FD8B07 /* TapManager.swift in Sources */,
 				42E1423D29CCB6A500FD8B07 /* ContentView.swift in Sources */,
+				42C3B63329D09571002887B5 /* PlayerManager.swift in Sources */,
+				42C3B63529D10EA2002887B5 /* AgnosticImage.swift in Sources */,
 				42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */,
 				42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */,
 				42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */,

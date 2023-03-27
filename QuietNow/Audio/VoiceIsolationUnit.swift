@@ -57,7 +57,7 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     try audioUnit.setProperty(property: kAudioUnitProperty_StreamFormat, scope: .output, data: metadata.processingFormat, dataSize: formatDescSize)
 
     // XXX: Denosing off? Default seems to be 1.0
-    try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 0.0, offset: 0)
+    try audioUnit.setParameter(parameter: 0x17626, scope: .global, value: 1.0, offset: 0)
     // XXX: Tuning mode?
     try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
     // XXX: Attenuation level?

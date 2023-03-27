@@ -11,6 +11,7 @@
 		42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */; };
 		426639E729D1FB3C00674DD6 /* TrackDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E629D1FB3C00674DD6 /* TrackDocument.swift */; };
 		426639E929D237DF00674DD6 /* AVIngressDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E829D237DF00674DD6 /* AVIngressDelegate.swift */; };
+		4298414229D24AAB00CA41C0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4298414129D24AAB00CA41C0 /* SettingsView.swift */; };
 		42C3B63129CFCA7F002887B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 42C3B63029CFCA7F002887B5 /* README.md */; };
 		42C3B63329D09571002887B5 /* PlayingTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63229D09571002887B5 /* PlayingTrack.swift */; };
 		42C3B63529D10EA2002887B5 /* AgnosticUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63429D10EA2002887B5 /* AgnosticUI.swift */; };
@@ -27,6 +28,7 @@
 		42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitWrapper.swift; sourceTree = "<group>"; };
 		426639E629D1FB3C00674DD6 /* TrackDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDocument.swift; sourceTree = "<group>"; };
 		426639E829D237DF00674DD6 /* AVIngressDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIngressDelegate.swift; sourceTree = "<group>"; };
+		4298414129D24AAB00CA41C0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		42C3B63029CFCA7F002887B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		42C3B63229D09571002887B5 /* PlayingTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingTrack.swift; sourceTree = "<group>"; };
 		42C3B63429D10EA2002887B5 /* AgnosticUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgnosticUI.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				42E1423C29CCB6A500FD8B07 /* PlayerView.swift */,
 				42C3B63229D09571002887B5 /* PlayingTrack.swift */,
 				426639E629D1FB3C00674DD6 /* TrackDocument.swift */,
+				4298414129D24AAB00CA41C0 /* SettingsView.swift */,
 				42E1423E29CCB6A700FD8B07 /* Assets.xcassets */,
 			);
 			path = QuietNow;
@@ -185,6 +188,7 @@
 				426639E729D1FB3C00674DD6 /* TrackDocument.swift in Sources */,
 				42C3B63329D09571002887B5 /* PlayingTrack.swift in Sources */,
 				42C3B63529D10EA2002887B5 /* AgnosticUI.swift in Sources */,
+				4298414229D24AAB00CA41C0 /* SettingsView.swift in Sources */,
 				42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */,
 				42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */,
 				42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */,

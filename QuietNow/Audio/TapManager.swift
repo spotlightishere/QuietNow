@@ -10,11 +10,12 @@ import AVKit
 import Foundation
 
 enum PlaybackError: Error {
-    case songNotFound
-    case metadataLoadError
     case audioUnitNotFound
     case audioUnitError(OSStatus)
     case exportFailed
+    case songNotFound
+    case metadataLoadError
+    case modelNotFound
 }
 
 /// Values within tap metadata are passed around throughout tap callbacks.

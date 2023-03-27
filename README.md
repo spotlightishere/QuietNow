@@ -7,7 +7,9 @@ Build and run on macOS, iPadOS, or iOS. Open any audio file, and playback will b
 
 You may additionally export and save a M4A of your current song with the current vocal attenuation level applied.
 
-![Screenshot of application with "Drugstore Perfume" by Gerard Way](https://owo.whats-th.is/41hVRdc.png)
+<img src="https://owo.whats-th.is/41hVRdc.png" alt="Screenshot of application with 'Drugstore Perfume' by Gerard Way" width="50%" />
+
+(I did say it was rudimentary. Hopefully it will serve as an example how to leverage the audio unit :)
 
 ## Vocal Isolation?
 Beginning in iOS 16.0 and macOS 13.0, a new audio unit entitled [AUSoundIsolation](https://developer.apple.com/documentation/audiotoolbox/1584154-effect_audio_unit_subtypes/kaudiounitsubtype_ausoundisolation) silently appeared.

@@ -12,6 +12,7 @@ struct ContentView: View {
     let audioPlayer = AVPlayer()
     @State var currentTrack = PlayingTrack()
     @State var vocalLevel: Float32 = 85.0
+    @State var exportButton = "Export"
     @State var exportProgress: Float = 0.0
 
     var body: some View {
@@ -22,6 +23,7 @@ struct ContentView: View {
                         .resizable()
                         .scaledToFit()
                 }.frame(minWidth: 0, maxWidth: .infinity)
+                    .padding()
 
                 VStack(alignment: .center) {
                     Text("\(currentTrack.title)")
@@ -29,6 +31,7 @@ struct ContentView: View {
                     Spacer()
                     Text("Attenuation level: \(vocalLevel)")
                 }.frame(minWidth: 0, maxWidth: .infinity)
+                    .padding()
             }.frame(minWidth: 0, maxWidth: .infinity)
                 .padding()
 
@@ -39,13 +42,15 @@ struct ContentView: View {
                 Text("Attenuation:")
             } onEditingChanged: { _ in
                 currentTrack.adjust(attenuationLevel: vocalLevel)
-            }
+            }.padding()
 
             // We'd also like an export button.
-            Button("Export... \(exportProgress)") {
+            Button("\(exportButton)") {
                 Task {
                     do {
+                        exportButton = "Exporting..."
                         try await currentTrack.export(progress: $exportProgress)
+                        exportButton = "Export"
                     } catch let e {
                         print("Exception while exporting: \(e)")
                     }
@@ -56,40 +61,41 @@ struct ContentView: View {
             }
         }
         .padding()
-        .frame(width: 500.0, height: 300.0)
+        .frame(maxWidth: 500.0, maxHeight: 300.0)
         .onAppear {
             // Begin playing as soon as possible.
             audioPlayer.play()
         }
         .onDrop(of: [.audio], isTargeted: nil) { items, _ in
             // We'll only utilize the first file.
-            if items.count != 1 {
-                return false
-            }
-            guard let firstItem = items.first else {
+            guard items.count == 1, let firstItem = items.first else {
                 return false
             }
 
-            // Load contents, and play!
             Task {
                 do {
                     guard let contents = try await firstItem.loadItem(forTypeIdentifier: UTType.audio.identifier) as? URL else {
                         return
                     }
-
-                    let potentialTrack = try await PlayingTrack(with: contents)
-                    audioPlayer.replaceCurrentItem(with: potentialTrack.playerItem)
-                    audioPlayer.play()
-                    // We initialize the audio unit to be 85.0, and it
-                    // would be a pain to persist that, so we are simply not.
-                    vocalLevel = 85.0
-                    currentTrack = potentialTrack
+                    try await loadSong(from: contents)
                 } catch let e {
-                    print("Exception while playing: \(e)")
+                    print("Error encountered while handling dropped song: \(e)")
                 }
             }
             return true
         }
+    }
+
+    /// Loads a song for the current audio player, applying a custom audio mix.
+    /// - Parameter contents: The URL to utilize when playing this song.
+    func loadSong(from contents: URL) async throws {
+        let potentialTrack = try await PlayingTrack(with: contents)
+        audioPlayer.replaceCurrentItem(with: potentialTrack.playerItem)
+        audioPlayer.play()
+        // We initialize the audio unit to be 85.0, and it
+        // would be a pain to persist that, so we are simply not.
+        vocalLevel = 85.0
+        currentTrack = potentialTrack
     }
 }
 

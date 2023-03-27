@@ -80,7 +80,11 @@ class PlayingTrack: ObservableObject {
 
     func export(progress currentProgress: Binding<Float>) async throws {
         // Prompt the user to select where to export.
-        let userLocation = await DialogHandler().fileSaveDialog()
+        guard let userLocation = await DialogHandler().fileSaveDialog() else {
+            // The user (hopefully) cancelled.
+            return
+        }
+
         guard let playerItem else {
             throw PlaybackError.exportFailed
         }

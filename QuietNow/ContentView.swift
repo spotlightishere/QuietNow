@@ -11,14 +11,33 @@ import SwiftUI
 struct ContentView: View {
     let audioPlayer = AVPlayer()
     @State var currentTrack = PlayingTrack()
+    @State var vocalLevel: Float32 = 85.0
 
     var body: some View {
-        HStack {
-            currentTrack.artwork
-                .fixedSize()
-            VStack {
-                Text("\(currentTrack.title)")
-                Text("\(currentTrack.album) \u{2014} \(currentTrack.artist)")
+        VStack {
+            HStack(spacing: 0) {
+                VStack(alignment: .center) {
+                    currentTrack.artwork
+                        .resizable()
+                        .scaledToFit()
+                }.frame(minWidth: 0, maxWidth: .infinity)
+
+                VStack(alignment: .center) {
+                    Text("\(currentTrack.title)")
+                    Text("\(currentTrack.album) \u{2014} \(currentTrack.artist)")
+                    Spacer()
+                    Text("Attenuation level: \(vocalLevel)")
+                }.frame(minWidth: 0, maxWidth: .infinity)
+            }.frame(minWidth: 0, maxWidth: .infinity)
+                .padding()
+
+            Slider(
+                value: $vocalLevel,
+                in: 0.0 ... 100.0
+            ) {
+                Text("Attenuation:")
+            } onEditingChanged: { _ in
+                currentTrack.adjust(attenuationLevel: vocalLevel)
             }
         }
         .padding()
@@ -45,6 +64,7 @@ struct ContentView: View {
 
                     let potentialTrack = try await PlayingTrack(with: contents)
                     audioPlayer.replaceCurrentItem(with: potentialTrack.playerItem)
+                    audioPlayer.play()
                     currentTrack = potentialTrack
                 } catch let e {
                     print("Exception while playing: \(e)")

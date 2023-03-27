@@ -57,4 +57,24 @@ class PlayingTrack: ObservableObject {
             }
         }
     }
+    
+    /// Adjusts the vocal attenuation level for the currently playing item.
+    /// - Parameter attenuationLevel: The desired level.
+    /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
+    func adjust(attenuationLevel: Float32) {
+        guard let audioMix else {
+            // Likely, nothing is playing.
+            return
+        }
+
+        let currentTap = audioMix.inputParameters.first!.audioTapProcessor!
+        let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(currentTap), to: TapMetadata.self)
+        let audioUnit = metadata.audioUnit!
+        do {
+            try audioUnit.setParameter(parameter: 0, scope: .global, value: attenuationLevel, offset: 0)
+            print(attenuationLevel)
+        } catch let e {
+            print("Error adjusting vocal attenuation level: \(e)")
+        }
+    }
 }

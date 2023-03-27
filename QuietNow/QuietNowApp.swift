@@ -13,6 +13,8 @@ struct QuietNowApp: App {
         WindowGroup {
             ContentView()
         }
+        #if os(macOS)
         .windowResizability(.contentSize)
+        #endif
     }
 }

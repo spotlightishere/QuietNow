@@ -17,7 +17,7 @@ struct TrackDocument: FileDocument {
     // We do not want to saving as we are read-only.
     static var writableContentTypes: [UTType] = []
 
-    let ingressQueue = DispatchQueue(label: "space.joscomputing.asset-ingress-queue")
+    let ingressQueue = DispatchQueue(label: "space.joscomputing.QuietNow.asset-ingress-queue")
     let ingressDelegate: AVIngressDelegate
     let audioAsset: AVURLAsset
 

@@ -9,24 +9,28 @@ import AVKit
 import SwiftUI
 
 struct PlayerView: View {
-    var file: TrackDocument
+    @EnvironmentObject var currentTrack: PlayingTrack
     @State var vocalLevel: Float32 = 85.0
     @State var exportButton = "Export"
     @State var exportProgress: Float = 0.0
 
+    // We'll leverage this AVPlayer for our track.
+    let audioPlayer = AVPlayer()
+
     var body: some View {
         VStack {
             HStack(spacing: 0) {
+                // Track album artwork
                 VStack(alignment: .center) {
-                    file.currentTrack.artwork
+                    currentTrack.artwork
                         .resizable()
                         .scaledToFit()
                 }.frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
 
+                // Track metadata
                 VStack(alignment: .center) {
-                    Text("\(file.currentTrack.title)")
-                    Text("\(file.currentTrack.album) \u{2014} \(file.currentTrack.artist)")
+                    Text("\(currentTrack.title)")
+                    Text("\(currentTrack.album) \u{2014} \(currentTrack.artist)")
                     Spacer()
                     Text("Attenuation level: \(vocalLevel)")
                 }.frame(minWidth: 0, maxWidth: .infinity)
@@ -40,7 +44,7 @@ struct PlayerView: View {
             ) {
                 Text("Attenuation:")
             } onEditingChanged: { _ in
-                file.currentTrack.adjust(attenuationLevel: vocalLevel)
+                currentTrack.adjust(attenuationLevel: vocalLevel)
             }.padding()
 
             // We'd also like an export button.
@@ -48,7 +52,7 @@ struct PlayerView: View {
                 Task {
                     do {
                         exportButton = "Exporting..."
-                        try await file.currentTrack.export(progress: $exportProgress)
+                        try await currentTrack.export(progress: $exportProgress)
                         exportButton = "Export"
                     } catch let e {
                         print("Exception while exporting: \(e)")
@@ -60,6 +64,9 @@ struct PlayerView: View {
             }
         }
         .padding()
-        .frame(maxWidth: 500.0, maxHeight: 300.0)
+        .task {
+            audioPlayer.replaceCurrentItem(with: currentTrack.playerItem)
+            audioPlayer.play()
+        }
     }
 }

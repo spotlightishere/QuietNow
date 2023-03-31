@@ -14,14 +14,19 @@ class PlayingTrack: ObservableObject {
     public var artist = "-"
     public var album = "-"
     public var artwork = Image(systemName: "music.quarternote.3")
-    public var playerItem: AVPlayerItem
-    private var audioMix: AVAudioMix
+    public var playerItem: AVPlayerItem?
+    private var audioMix: AVAudioMix?
 
-    init(with asset: AVAsset) async throws {
+    /// Fully loads the given asset, creating the audio mix and siphoning metadata.
+    ///
+    /// Ideally, loading would also be performed in initialization or similar.
+    /// Unfortunately, it appears to be difficult to leverage async with a SwiftUI FileDocument.
+    /// - Parameter asset: The AVAsset to create an audio mix for.
+    func load(asset: AVAsset) async throws {
         // Applying this audio mix allows us to leverage the audio unit throughout playback.
         audioMix = try await createAudioMix(for: asset)
         playerItem = AVPlayerItem(asset: asset)
-        playerItem.audioMix = audioMix
+        playerItem!.audioMix = audioMix
 
         // Attempt to fill in metadata if it is available.
         let assetMetadata = try await asset.load(.commonMetadata)
@@ -54,6 +59,10 @@ class PlayingTrack: ObservableObject {
     /// - Parameter attenuationLevel: The desired level.
     /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
     func adjust(attenuationLevel: Float32) {
+        guard let audioMix else {
+            return
+        }
+
         let currentTap = audioMix.inputParameters.first!.audioTapProcessor!
         let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(currentTap), to: TapMetadata.self)
         let audioUnit = metadata.audioUnit!
@@ -66,13 +75,16 @@ class PlayingTrack: ObservableObject {
     }
 
     func export(progress currentProgress: Binding<Float>) async throws {
+        guard let asset = playerItem?.asset else {
+            return
+        }
+
         // Prompt the user to select where to export.
         guard let userLocation = await DialogHandler().fileSaveDialog() else {
             // The user (hopefully) cancelled.
             return
         }
 
-        let asset = playerItem.asset
         let exportAudioMix = try await createAudioMix(for: asset)
 
         guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {

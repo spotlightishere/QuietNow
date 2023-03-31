@@ -14,15 +14,13 @@ struct TrackDocument: FileDocument {
     // We will attempt to support any audio type.
     static var readableContentTypes: [UTType] = [.audio]
 
-    // We do not want to support snapshotting as we're read-only.
-    // We use Int simply because we can.
+    // We do not want to saving as we are read-only.
     static var writableContentTypes: [UTType] = []
 
-    // Our view will interface with our AVPlayer and AVPlayerItem.
-    let audioPlayer = AVPlayer()
-    @State var currentTrack: PlayingTrack
+    let ingressQueue = DispatchQueue(label: "space.joscomputing.asset-ingress-queue")
+    let ingressDelegate: AVIngressDelegate
+    let audioAsset: AVURLAsset
 
-    @MainActor
     init(configuration: ReadConfiguration) throws {
         guard let fileContents = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadUnknown)
@@ -31,38 +29,46 @@ struct TrackDocument: FileDocument {
         // We need to create an AVAsset from the provided file contents.
         // Frustratingly, this is rather difficult out-of-the-box.
         //
-        // Here, we use a custom schema - "ingress-asset" - to force
+        // Here, we use a custom schema - "asset-ingress" - to force
         // our AVIngressDelegate to be called, allowing for us to feed
         // the user chosen file's data as-is.
-        let ingressAsset = AVURLAsset(url: URL(string: "ingress-asset://example")!)
-        let ingressDelegate = AVIngressDelegate(contents: fileContents, type: configuration.contentType)
-        ingressAsset.resourceLoader.setDelegate(ingressDelegate, queue: .main)
-
-        // Further frustratingly, we need async throughout initialization
-        // for reading AVAsset components. On the other hand, we need to synchronously initialize.
-        // Dear future employers, this code does not exist. Safety is gone. Welcome to the wild west.
-        var trackValue: Result<PlayingTrack, Error> = .failure(CocoaError(.fileReadUnknown))
-        let loadSemaphore = DispatchSemaphore(value: 0)
-        Task {
-            do {
-                let createdTrack = try await PlayingTrack(with: ingressAsset)
-                trackValue = .success(createdTrack)
-            } catch let e {
-                print("Encountered error loading track: \(e)")
-                trackValue = .failure(e)
-            }
-            loadSemaphore.signal()
-        }
-        loadSemaphore.wait()
-        currentTrack = try trackValue.get()
-
-        // Lastly, begin playing!
-        audioPlayer.replaceCurrentItem(with: currentTrack.playerItem)
-        audioPlayer.play()
+        audioAsset = AVURLAsset(url: URL(string: "asset-ingress://example")!)
+        ingressDelegate = AVIngressDelegate(contents: fileContents, type: configuration.contentType)
+        audioAsset.resourceLoader.setDelegate(ingressDelegate, queue: ingressQueue)
     }
 
     func fileWrapper(configuration _: WriteConfiguration) throws -> FileWrapper {
         // We do not support saving.
         throw CocoaError(.fileWriteNoPermission)
+    }
+}
+
+struct TrackDocumentView: View {
+    var file: TrackDocument
+    @StateObject var currentTrack = PlayingTrack()
+    // This is rather jank...
+    @State private var trackLoaded = false
+    @State private var errorText = ""
+
+    var body: some View {
+        if trackLoaded {
+            PlayerView()
+                .environmentObject(currentTrack)
+        } else if errorText != "" {
+            Text(errorText)
+        } else {
+            ProgressView("Loading track...")
+                .onAppear {
+                    Task {
+                        do {
+                            try await currentTrack.load(asset: file.audioAsset)
+                            trackLoaded = true
+                        } catch let e {
+                            print("Encountered exception while loading track: \(e)")
+                            errorText = "An error occurred while loading: \(e)"
+                        }
+                    }
+                }
+        }
     }
 }

@@ -7,7 +7,7 @@ Build and run on macOS, iPadOS, or iOS. Open any audio file, and playback will b
 
 You may additionally export and save a M4A of your current song with the current vocal attenuation level applied.
 
-<img src="https://owo.whats-th.is/41hVRdc.png" alt="Screenshot of application with 'Drugstore Perfume' by Gerard Way" width="50%" />
+<img src="https://owo.whats-th.is/z67gwRu.png" alt="Screenshot of application with 'Drugstore Perfume' by Gerard Way" width="50%" />
 
 (I did say it was rudimentary. Hopefully it will serve as an example how to leverage the audio unit :)
 
@@ -28,7 +28,7 @@ This aligns with their second-generation neural engine (present in A13 and above
 | Parameter ID | Name          | Value | Description  |
 | ------------ | ------------- | ----- | ------------ |
 | 95782        | UseTuningMode | 1.0   | The default is 1.0, used as a boolean. |
-| 95783        | TuningMode    | 1.0.  | Similarly, this is set to 1.0.         |
+| 95783        | TuningMode    | 1.0   | Similarly, this is set to 1.0.         |
 | 0            | `kAUSoundIsolationParam_WetDryMixPercent` | 85.0 | The amount to remove vocals by. Should be 0.0 to 100.0 - any value above increases vocal volumes significantly. (Try 1000.0 with your volume set to 1%.) |
 
 ### Audio Unit Properties

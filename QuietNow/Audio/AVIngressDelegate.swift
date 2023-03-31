@@ -7,6 +7,9 @@
 
 import AVFoundation
 import Foundation
+import OSLog
+
+let ingressLogger = Logger(subsystem: "space.joscomputing.QuietNow", category: "Asset Ingress")
 
 /// It is alarmingly difficult to create an AVAsset from Data.
 /// (This is probably for fair reasons - it would be awful to download a 1.7 GB movie and synchronously load it.)
@@ -31,6 +34,8 @@ class AVIngressDelegate: NSObject, AVAssetResourceLoaderDelegate {
         if endOffset > internalData.count {
             return false
         }
+
+        ingressLogger.debug("Resource loader requested \(requestedLength) bytes starting at offset \(requestedOffset)")
 
         // This appears to require UTI form (public.mpeg) verses MIME (audio/mpeg).
         loadingRequest.contentInformationRequest?.contentType = internalType.identifier

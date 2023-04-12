@@ -8,7 +8,6 @@ Build and run on macOS, iPadOS, or iOS. Open any audio file, and playback will b
 You may additionally export and save a M4A of your current song with the current vocal attenuation level applied.
 
 <img src="https://owo.whats-th.is/4higMn8.png" alt="Screenshot of the application on macOS with 'Drugstore Perfume' by Gerard Way" width="50%" height="50%" />
-<img src="https://owo.whats-th.is/AKtFeUC.png" alt="Screenshot of the application on iOS with 'Drugstore Perfume' by Gerard Way" width="50%" height="50%" />
 
 (I did say it was rudimentary. Hopefully it will serve as an example how to leverage the audio unit :)
 

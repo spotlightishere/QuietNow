@@ -56,19 +56,19 @@ struct TrackDocumentView: View {
                 .environmentObject(currentTrack)
         } else if errorText != "" {
             Text(errorText)
+                .padding()
         } else {
             ProgressView("Loading track...")
-                .onAppear {
-                    Task {
-                        do {
-                            try await currentTrack.load(asset: file.audioAsset)
-                            trackLoaded = true
-                        } catch let e {
-                            print("Encountered exception while loading track: \(e)")
-                            errorText = "An error occurred while loading: \(e)"
-                        }
+                .task {
+                    do {
+                        try await currentTrack.load(asset: file.audioAsset)
+                        trackLoaded = true
+                    } catch let e {
+                        print("Encountered exception while loading track: \(e)")
+                        errorText = "An error occurred while loading: \(e)"
                     }
                 }
+                .padding()
         }
     }
 }

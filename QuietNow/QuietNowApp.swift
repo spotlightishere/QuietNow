@@ -37,11 +37,11 @@ struct QuietNowApp: App {
     var body: some Scene {
         DocumentGroup(viewing: TrackDocument.self) { loadedFile in
             TrackDocumentView(file: loadedFile.document)
-                .frame(width: 500.0, height: 300.0)
+            #if os(macOS)
+                // Under macOS, SwiftUI allows a very interesting default layout without a minimum set.
+                .frame(minWidth: 500.0, minHeight: 500.0)
+            #endif
         }
-        #if os(macOS)
-        .windowResizability(.contentSize)
-        #endif
 
         #if os(macOS)
             Settings {

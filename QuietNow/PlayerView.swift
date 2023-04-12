@@ -9,10 +9,11 @@ import AVKit
 import SwiftUI
 
 struct PlayerView: View {
+    // Track playback
     @EnvironmentObject var currentTrack: PlayingTrack
+    // We mirror currentTrack.vocalLevel here within `task`.
+    // 85.0 is a good default, and is also what it begins with.
     @State var vocalLevel: Float32 = 85.0
-    @State var isExporting = false
-    @State var exportProgress: Float = 0.0
 
     // We'll leverage this AVPlayer for our track.
     let audioPlayer = AVPlayer()
@@ -23,6 +24,12 @@ struct PlayerView: View {
         formatter.minimumFractionDigits = 4
         return formatter
     }()
+
+    // Export state
+    @State var stateDocument: ExportTrackDocument? = nil
+    @State var exportProgress: Float = 0.0
+    @State var isExporting = false
+    @State var readyToSave = false
 
     var body: some View {
         Grid(alignment: .center) {
@@ -79,11 +86,13 @@ struct PlayerView: View {
                     Task {
                         do {
                             isExporting = true
-                            try await currentTrack.export(progress: $exportProgress)
-                            isExporting = false
+                            let exportLocation = try await currentTrack.export(progress: $exportProgress)
+                            stateDocument = ExportTrackDocument(location: exportLocation)
+                            // Present our save dialog.
+                            readyToSave = true
                         } catch let e {
                             print("Exception while exporting: \(e)")
-                            isExporting = false
+                            readyToSave = false
                         }
                     }
                 }.disabled(isExporting)
@@ -93,6 +102,26 @@ struct PlayerView: View {
             audioPlayer.replaceCurrentItem(with: currentTrack.playerItem)
             audioPlayer.play()
         }
+        .fileExporter(isPresented: $readyToSave, document: stateDocument, contentType: .audio, defaultFilename: "exported.m4a", onCompletion: { result in
+            switch result {
+            case let .failure(e):
+                print("Encountered exception while saving: \(e)")
+            case let .success(url):
+                print("Saved to \(url)!")
+                // Clean up after ourselves.
+                do {
+                    guard let fileLocation = stateDocument?.fileLocation else {
+                        // ...how did we complete with a nil origin location?
+                        return
+                    }
+
+                    try FileManager.default.removeItem(at: fileLocation)
+                } catch _ {}
+            }
+
+            isExporting = false
+            readyToSave = false
+        })
     }
 }
 
@@ -133,7 +162,7 @@ struct PlayerView_Previews: PreviewProvider {
             .environmentObject(noArtTrack)
             .previewDisplayName("Without Artwork")
         // Track with export progress
-        PlayerView(isExporting: true, exportProgress: 75.0)
+        PlayerView(exportProgress: 75.0, isExporting: true)
             .environmentObject(exportTrack)
             .previewDisplayName("Export Progress")
     }

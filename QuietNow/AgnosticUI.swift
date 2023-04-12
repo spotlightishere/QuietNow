@@ -24,25 +24,3 @@ func agnosticImage(data: Data) -> Image {
         Image(uiImage: UIImage(data: data)!)
     #endif
 }
-
-@MainActor
-struct DialogHandler {
-    /// Prompts the user to save an audio file.
-    /// - Returns: The URL the user chose, or nil if cancelled.
-    func fileSaveDialog() async -> URL? {
-        #if os(macOS)
-            let savePanel = NSSavePanel()
-            savePanel.nameFieldStringValue = "exported.m4a"
-            switch await savePanel.begin() {
-            case .OK:
-                return savePanel.url
-            default:
-                return nil
-            }
-
-        #else
-            // TODO: Implement
-            return URL.temporaryDirectory.appending(path: "exported.m4a")
-        #endif
-    }
-}

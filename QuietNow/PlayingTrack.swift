@@ -16,6 +16,7 @@ class PlayingTrack: ObservableObject {
     public var artwork = Image(systemName: "music.quarternote.3")
     public var playerItem: AVPlayerItem?
     private var audioMix: AVAudioMix?
+    @State public var vocalLevel: Float32 = 0.0
 
     /// Fully loads the given asset, creating the audio mix and siphoning metadata.
     ///
@@ -24,7 +25,7 @@ class PlayingTrack: ObservableObject {
     /// - Parameter asset: The AVAsset to create an audio mix for.
     func load(asset: AVAsset) async throws {
         // Applying this audio mix allows us to leverage the audio unit throughout playback.
-        audioMix = try await createAudioMix(for: asset)
+        audioMix = try await createAudioMix(for: asset, initialLevel: vocalLevel)
         playerItem = AVPlayerItem(asset: asset)
         playerItem!.audioMix = audioMix
 
@@ -57,41 +58,34 @@ class PlayingTrack: ObservableObject {
 
     /// Adjusts the vocal attenuation level for the currently playing item.
     /// - Parameter attenuationLevel: The desired level.
-    /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
+    /// 0.0 represents off. 100.0 is the intended maximum.
     func adjust(attenuationLevel: Float32) {
         guard let audioMix else {
             return
         }
 
-        let currentTap = audioMix.inputParameters.first!.audioTapProcessor!
-        let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(currentTap), to: TapMetadata.self)
-        let audioUnit = metadata.audioUnit!
-        do {
-            try audioUnit.setParameter(parameter: 0, scope: .global, value: attenuationLevel, offset: 0)
-            print("Attenuation level is now \(attenuationLevel)")
-        } catch let e {
-            print("Error adjusting vocal attenuation level: \(e)")
-        }
+        audioMix.adjust(attenuationLevel: attenuationLevel)
+        vocalLevel = attenuationLevel
+        print("Attenuation level is now \(attenuationLevel)")
     }
 
-    func export(progress currentProgress: Binding<Float>) async throws {
+    func export(progress currentProgress: Binding<Float>) async throws -> URL {
         guard let asset = playerItem?.asset else {
-            return
+            throw PlaybackError.songNotFound
         }
 
-        // Prompt the user to select where to export.
-        guard let userLocation = await DialogHandler().fileSaveDialog() else {
-            // The user (hopefully) cancelled.
-            return
-        }
+        // We will write to a temporary location in order to leverage SwiftUI's file wrapper.
+        let temporaryLocation = URL.temporaryDirectory.appending(component: "\(UUID().uuidString).m4a")
 
-        let exportAudioMix = try await createAudioMix(for: asset)
+        // Set attenuation level for our export audio mix to the current level.
+        let exportAudioMix = try await createAudioMix(for: asset, initialLevel: vocalLevel)
 
+        // Begin export!
         guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {
             throw PlaybackError.exportFailed
         }
         exportSession.audioMix = exportAudioMix
-        exportSession.outputURL = userLocation
+        exportSession.outputURL = temporaryLocation
         exportSession.outputFileType = .m4a
 
         let exportTimer = Timer(timeInterval: 0.5, repeats: true) { currentTimer in
@@ -112,5 +106,24 @@ class PlayingTrack: ObservableObject {
         }
         RunLoop.main.add(exportTimer, forMode: .common)
         await exportSession.export()
+
+        return temporaryLocation
+    }
+}
+
+/// Ease-of-use extension for adjusting attenuation levels.
+extension AVAudioMix {
+    /// Adjusts the vocal attenuation level for the current audio mix.
+    /// - Parameter attenuationLevel: The desired level.
+    /// 0.0 represents off. Upper bounds are 1000.0, although any value beyond 100.0 produces rather unique results.
+    func adjust(attenuationLevel: Float32) {
+        let currentTap = inputParameters.first!.audioTapProcessor!
+        let metadata = unsafeBitCast(MTAudioProcessingTapGetStorage(currentTap), to: TapMetadata.self)
+        let audioUnit = metadata.audioUnit!
+        do {
+            try audioUnit.setParameter(parameter: 0, scope: .global, value: attenuationLevel, offset: 0)
+        } catch let e {
+            print("Error adjusting vocal attenuation level: \(e)")
+        }
     }
 }

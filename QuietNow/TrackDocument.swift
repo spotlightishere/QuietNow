@@ -10,10 +10,11 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// The primary track document used to load an asset. It should be considered read-only.
+/// To export a track, asynchronously create an ``ExportTrackDocument``.
 struct TrackDocument: FileDocument {
     // We will attempt to support any audio type.
     static var readableContentTypes: [UTType] = [.audio]
-
     // We do not want to saving as we are read-only.
     static var writableContentTypes: [UTType] = []
 
@@ -43,9 +44,37 @@ struct TrackDocument: FileDocument {
     }
 }
 
+/// To work around the need of Swift asynchronous and the lack of support with SwiftUI,
+/// ExportTrackDocument exists. For normal reading and operations, use ``TrackDocument``.
+struct ExportTrackDocument: FileDocument {
+    // We do not want to reading as we are write-only.
+    static var readableContentTypes: [UTType] = []
+    static var writableContentTypes: [UTType] = [.audio]
+
+    let fileLocation: URL?
+
+    init(configuration _: ReadConfiguration) throws {
+        // We do not support reading directly.
+        throw CocoaError(.fileReadNoPermission)
+    }
+
+    init(location: URL) {
+        fileLocation = location
+    }
+
+    func fileWrapper(configuration _: WriteConfiguration) throws -> FileWrapper {
+        guard let fileLocation else {
+            throw CocoaError(.fileWriteUnknown)
+        }
+
+        return try FileWrapper(url: fileLocation, options: .immediate)
+    }
+}
+
 struct TrackDocumentView: View {
     var file: TrackDocument
     @StateObject var currentTrack = PlayingTrack()
+
     // This is rather jank...
     @State private var trackLoaded = false
     @State private var errorText = ""

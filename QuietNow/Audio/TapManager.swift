@@ -24,6 +24,7 @@ enum PlaybackError: Error {
     var maxFrameCount: UInt32 = 0
     var processingFormat: UnsafePointer<AudioStreamBasicDescription>? = nil
     var sampleCount: Float64 = 0.0
+    var initialLevel: Float32 = 0.0
 }
 
 // Via tap callbacks, we can glean information about the track
@@ -34,10 +35,20 @@ enum PlaybackError: Error {
 // It is also very similar to that of MediaPlaybackCore.framework.
 enum TapLifecycle {
     // Within initialization, we hackily allocate our metadata type.
-    static let tapInitCallback: MTAudioProcessingTapInitCallback = { _, _, tapStorageOut in
+    static let tapInitCallback: MTAudioProcessingTapInitCallback = { _, clientInfo, tapStorageOut in
+        // Get our initial vocal level.
+        guard let clientInfo else {
+            // Hm...
+            fatalError("Client info was nil.")
+        }
+        var startingLevel = clientInfo.bindMemory(to: Float32.self, capacity: 1)
+
         let metadata = TapMetadata()
+        metadata.initialLevel = startingLevel.pointee
         let storage = Unmanaged.passRetained(metadata)
         tapStorageOut.pointee = storage.toOpaque()
+
+        clientInfo.deallocate()
     }
 
     // Within finalize, we must free our previously hackily-allocated metadata type.
@@ -57,7 +68,7 @@ enum TapLifecycle {
         metadata.maxFrameCount = UInt32(maxFrameCount)
         metadata.processingFormat = processingFormat
 
-        let audioUnit = createVocalIsolationUnit(with: currentTap)
+        let audioUnit = createVocalIsolationUnit(with: currentTap, metadata: metadata)
         metadata.audioUnit = audioUnit
     }
 
@@ -90,7 +101,7 @@ enum TapLifecycle {
     }
 }
 
-func createAudioMix(for audioAsset: AVAsset) async throws -> AVAudioMix {
+func createAudioMix(for audioAsset: AVAsset, initialLevel vocalLevel: Float32) async throws -> AVAudioMix {
     // Let's find the first track that's audio.
     let availableTracks = try await audioAsset.loadTracks(withMediaType: .audio)
     guard let audioTrack = availableTracks.first else {
@@ -103,10 +114,15 @@ func createAudioMix(for audioAsset: AVAsset) async throws -> AVAudioMix {
     let audioMix = AVMutableAudioMix()
     let mixInputParameters = AVMutableAudioMixInputParameters(track: audioTrack)
 
+    // We need to specify an initial vocal level.
+    // We'll manually allocate a float specifying this level and pass it as client info.
+    let startingLevel = UnsafeMutablePointer<Float32>.allocate(capacity: 1)
+    startingLevel.initialize(to: vocalLevel)
+
     // Create the tap.
     var tapCallbacks = MTAudioProcessingTapCallbacks(
         version: kMTAudioProcessingTapCallbacksVersion_0,
-        clientInfo: nil,
+        clientInfo: startingLevel,
         init: TapLifecycle.tapInitCallback,
         finalize: TapLifecycle.tapFinalizeCallback,
         prepare: TapLifecycle.tapPrepareCallback,

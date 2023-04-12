@@ -11,9 +11,9 @@ import Foundation
 /// There's no clean way for us to handle errors while processing, so we handle this
 /// by crashing. Sure, this brings us back to Microsoft® Windows™ levels of error handling,
 /// but this is okay. Probably.
-func createVocalIsolationUnit(with tap: MTAudioProcessingTap) -> AudioUnit {
+func createVocalIsolationUnit(with tap: MTAudioProcessingTap, metadata: TapMetadata) -> AudioUnit {
     do {
-        return try createUnit(with: tap)
+        return try createUnit(with: tap, metadata: metadata)
     } catch let e {
         print("Encountered exception while creating vocal isolation unit: \(e)")
         abort()
@@ -27,7 +27,7 @@ let renderCallbackSize = UInt32(MemoryLayout<AURenderCallbackStruct>.size)
 let stringPointerSize = UInt32(MemoryLayout<CFString>.size)
 
 /// Creates the custom vocal isolation audio unit.
-func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
+func createUnit(with tap: MTAudioProcessingTap, metadata _: TapMetadata) throws -> AudioUnit {
     // Attempt to find the voice isolation audio component.
     //  - Manufacturer: Apple
     //  - Type: Effect
@@ -61,7 +61,8 @@ func createUnit(with tap: MTAudioProcessingTap) throws -> AudioUnit {
     // XXX: Tuning mode
     try audioUnit.setParameter(parameter: 0x17627, scope: .global, value: 1.0, offset: 0)
     // XXX: Attenuation level - referred to as "wet/dry mix percent"
-    try audioUnit.setParameter(parameter: kAUSoundIsolationParam_WetDryMixPercent, scope: .global, value: 85.0, offset: 0)
+    // We know our initial level from metadata. A good default is 85.0.
+    try audioUnit.setParameter(parameter: kAUSoundIsolationParam_WetDryMixPercent, scope: .global, value: metadata.initialLevel, offset: 0)
 
     // Next, we'll need to create a render callback to give audio input.
     let audioInputCallback: AURenderCallback = { inputRef, _, _, _, frameCount, dataBuffer -> OSStatus in

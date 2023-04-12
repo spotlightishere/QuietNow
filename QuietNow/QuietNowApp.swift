@@ -42,8 +42,15 @@ struct QuietNowApp: App {
                 .frame(minWidth: 500.0, minHeight: 500.0)
             #endif
         }
+        #if os(macOS)
+        // Attempt to avoid having a save button.
+        .commands {
+            CommandGroup(replacing: .saveItem) {}
+        }
+        #endif
 
         #if os(macOS)
+            // Allow configuring model path
             Settings {
                 SettingsView()
             }

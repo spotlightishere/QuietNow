@@ -9,6 +9,11 @@ import AVFoundation
 import Foundation
 import SwiftUI
 
+/// The initial vocal level we want to begin with.
+struct PlaybackDefaults {
+    public static let initialVocalLevel: Float32 = 85.0
+}
+
 class PlayingTrack: ObservableObject {
     public var title = "Unknown title"
     public var artist = "-"
@@ -16,7 +21,6 @@ class PlayingTrack: ObservableObject {
     public var artwork = Image(systemName: "music.quarternote.3")
     public var playerItem: AVPlayerItem?
     private var audioMix: AVAudioMix?
-    @State public var vocalLevel: Float32 = 0.0
 
     /// Fully loads the given asset, creating the audio mix and siphoning metadata.
     ///
@@ -25,7 +29,7 @@ class PlayingTrack: ObservableObject {
     /// - Parameter asset: The AVAsset to create an audio mix for.
     func load(asset: AVAsset) async throws {
         // Applying this audio mix allows us to leverage the audio unit throughout playback.
-        audioMix = try await createAudioMix(for: asset, initialLevel: vocalLevel)
+        audioMix = try await createAudioMix(for: asset, initialLevel: PlaybackDefaults.initialVocalLevel)
         playerItem = AVPlayerItem(asset: asset)
         playerItem!.audioMix = audioMix
 
@@ -65,11 +69,10 @@ class PlayingTrack: ObservableObject {
         }
 
         audioMix.adjust(attenuationLevel: attenuationLevel)
-        vocalLevel = attenuationLevel
         print("Attenuation level is now \(attenuationLevel)")
     }
 
-    func export(progress currentProgress: Binding<Float>) async throws -> URL {
+    func export(progress currentProgress: Binding<Float>, attenuationLevel: Float32) async throws -> URL {
         guard let asset = playerItem?.asset else {
             throw PlaybackError.songNotFound
         }
@@ -78,7 +81,7 @@ class PlayingTrack: ObservableObject {
         let temporaryLocation = URL.temporaryDirectory.appending(component: "\(UUID().uuidString).m4a")
 
         // Set attenuation level for our export audio mix to the current level.
-        let exportAudioMix = try await createAudioMix(for: asset, initialLevel: vocalLevel)
+        let exportAudioMix = try await createAudioMix(for: asset, initialLevel: attenuationLevel)
 
         // Begin export!
         guard let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetAppleM4A) else {

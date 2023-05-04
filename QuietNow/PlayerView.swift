@@ -13,7 +13,7 @@ struct PlayerView: View {
     @EnvironmentObject var currentTrack: PlayingTrack
     // We mirror currentTrack.vocalLevel here within `task`.
     // 85.0 is a good default, and is also what it begins with.
-    @State var vocalLevel: Float32 = 85.0
+    @State var vocalLevel: Float32 = PlaybackDefaults.initialVocalLevel
 
     // We'll leverage this AVPlayer for our track.
     let audioPlayer = AVPlayer()
@@ -86,7 +86,7 @@ struct PlayerView: View {
                     Task {
                         do {
                             isExporting = true
-                            let exportLocation = try await currentTrack.export(progress: $exportProgress)
+                            let exportLocation = try await currentTrack.export(progress: $exportProgress, attenuationLevel: vocalLevel)
                             stateDocument = ExportTrackDocument(location: exportLocation)
                             // Present our save dialog.
                             readyToSave = true

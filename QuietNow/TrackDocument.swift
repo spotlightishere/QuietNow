@@ -78,9 +78,12 @@ struct TrackDocumentView: View {
     // This is rather jank...
     @State private var trackLoaded = false
     @State private var errorText = ""
+    @AppStorage(ModelPathKey) private var modelPath = getModelPath()
 
     var body: some View {
-        if trackLoaded {
+        if modelPath.isEmpty {
+            SettingsView()
+        } else if trackLoaded {
             PlayerView()
                 .environmentObject(currentTrack)
         } else if errorText != "" {

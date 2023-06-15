@@ -11,6 +11,7 @@
 		42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */; };
 		426639E729D1FB3C00674DD6 /* TrackDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E629D1FB3C00674DD6 /* TrackDocument.swift */; };
 		426639E929D237DF00674DD6 /* AVIngressDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426639E829D237DF00674DD6 /* AVIngressDelegate.swift */; };
+		426A7C742A3AAE4C004C313A /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 426A7C732A3AAE4C004C313A /* ModelManager.swift */; };
 		4298414229D24AAB00CA41C0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4298414129D24AAB00CA41C0 /* SettingsView.swift */; };
 		42C3B63129CFCA7F002887B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 42C3B63029CFCA7F002887B5 /* README.md */; };
 		42C3B63329D09571002887B5 /* PlayingTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42C3B63229D09571002887B5 /* PlayingTrack.swift */; };
@@ -29,6 +30,7 @@
 		42398C7829CED1D300897F96 /* AudioUnitWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUnitWrapper.swift; sourceTree = "<group>"; };
 		426639E629D1FB3C00674DD6 /* TrackDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackDocument.swift; sourceTree = "<group>"; };
 		426639E829D237DF00674DD6 /* AVIngressDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVIngressDelegate.swift; sourceTree = "<group>"; };
+		426A7C732A3AAE4C004C313A /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
 		4298414129D24AAB00CA41C0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		42C3B63029CFCA7F002887B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		42C3B63229D09571002887B5 /* PlayingTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingTrack.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 				42E1423C29CCB6A500FD8B07 /* PlayerView.swift */,
 				42C3B63229D09571002887B5 /* PlayingTrack.swift */,
 				426639E629D1FB3C00674DD6 /* TrackDocument.swift */,
+				426A7C732A3AAE4C004C313A /* ModelManager.swift */,
 				4298414129D24AAB00CA41C0 /* SettingsView.swift */,
 				42E1423E29CCB6A700FD8B07 /* Assets.xcassets */,
 				42E1424029CCB6A700FD8B07 /* Preview Content */,
@@ -150,7 +153,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					42E1423629CCB6A500FD8B07 = {
 						CreatedOnToolsVersion = 14.3;
@@ -202,6 +205,7 @@
 				42C3B63529D10EA2002887B5 /* AgnosticUI.swift in Sources */,
 				4298414229D24AAB00CA41C0 /* SettingsView.swift in Sources */,
 				42398C7629CEBD8800897F96 /* VoiceIsolationUnit.swift in Sources */,
+				426A7C742A3AAE4C004C313A /* ModelManager.swift in Sources */,
 				42E1423B29CCB6A500FD8B07 /* QuietNowApp.swift in Sources */,
 				42398C7929CED1D300897F96 /* AudioUnitWrapper.swift in Sources */,
 				426639E929D237DF00674DD6 /* AVIngressDelegate.swift in Sources */,
@@ -215,6 +219,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -247,6 +252,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -275,6 +281,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -307,6 +314,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

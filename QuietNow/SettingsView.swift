@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct SettingsView: View {
-    @AppStorage("modelPath") private var modelPath = ""
+    @AppStorage(ModelPathKey) private var modelPath = ""
 
     var body: some View {
         Form {

@@ -80,14 +80,7 @@ func createUnit(with tap: MTAudioProcessingTap, metadata _: TapMetadata) throws 
     try audioUnit.setProperty(property: kAudioUnitProperty_SetRenderCallback, scope: .input, data: &audioInputFunc, dataSize: renderCallbackSize)
 
     // Lastly, specify models locations.
-    #if os(macOS)
-        // Under macOS, this must be a configurable location.
-        let modelDirectory = URL(filePath: UserDefaults.standard.string(forKey: "modelPath") ?? "")
-    #else
-        // We will rely on the location of MediaPlaybackCore.framework.
-        // While we should likely look up its bundle by identifier, hardcoding will suffice for now.
-        let modelDirectory = URL(filePath: "/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")
-    #endif
+    let modelDirectory = URL(filePath: getModelPath())
     guard try modelDirectory.checkResourceIsReachable() else {
         throw PlaybackError.modelNotFound
     }

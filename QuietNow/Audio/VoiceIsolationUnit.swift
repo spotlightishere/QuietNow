@@ -86,11 +86,11 @@ func createUnit(with tap: MTAudioProcessingTap, metadata _: TapMetadata) throws 
     }
 
     // XXX: 30000 is plist path
-    var plistPath = modelDirectory.appending(component: "aufx-nnet-appl.plist").path() as CFString
+    var plistPath = modelDirectory.appending(component: "aufx-nnet-appl.plist").path(percentEncoded: false) as CFString
     try audioUnit.setProperty(property: 30000, scope: .global, data: &plistPath, dataSize: stringPointerSize)
 
     // XXX: 40000 is model base path
-    var modelBasePath = modelDirectory.path() as CFString
+    var modelBasePath = modelDirectory.path(percentEncoded: false) as CFString
     try audioUnit.setProperty(property: 40000, scope: .global, data: &modelBasePath, dataSize: stringPointerSize)
 
     // XXX: 50000 disables dereverb

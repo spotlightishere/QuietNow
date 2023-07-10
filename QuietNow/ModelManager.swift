@@ -92,7 +92,6 @@ func getModelPath() -> String {
     do {
         let simulatorRuntimes = try fetchSimulatorRuntimes()
         possibleLocations += simulatorRuntimes
-        print("Simulator runtime paths: \(possibleLocations)")
     } catch {
         // You'll have to configure the path on your own, sorry :)
     }

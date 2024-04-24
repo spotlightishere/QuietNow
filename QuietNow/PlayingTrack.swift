@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 
 /// The initial vocal level we want to begin with.
-struct PlaybackDefaults {
+enum PlaybackDefaults {
     public static let initialVocalLevel: Float32 = 85.0
 }
 

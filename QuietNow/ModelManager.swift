@@ -101,8 +101,7 @@ let ModelPathKey = "modelPath"
 extension URL {
     /// Quick quality-of-life hack to avoid repeatedly calling out to FileManager.
     func exists() -> Bool {
-        print("checking \(path())")
-        return FileManager.default.fileExists(atPath: rawPath)
+        FileManager.default.fileExists(atPath: rawPath)
     }
 
     /// A similar quality-of-life hack to avoid a ton of URL encoded paths.

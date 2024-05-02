@@ -90,7 +90,7 @@ let ModelPathKey = "modelPath"
 #else
 
     // Shim to provide support for iOS, watchOS, tvOS, xrOS, [...] discovery. It does not throw.
-    func getFrameworkPaths() -> [String] {
+    func getFrameworkPaths() -> [URL] {
         // We will rely on the location of MediaPlaybackCore.framework.
         // While we should likely look up its bundle by identifier, hardcoding will suffice for now.
         return [URL(filePath: "/System/Library/PrivateFrameworks/MediaPlaybackCore.framework")]

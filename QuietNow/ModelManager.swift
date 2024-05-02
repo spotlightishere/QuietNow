@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import OSLog
+
+let logger = Logger(subsystem: "space.joscomputing.QuietNow", category: "ModelDiscovery")
 
 enum ModelError: Error {
     case modelNotFound
@@ -133,6 +136,7 @@ func getModelPath() -> String {
 
         // Ensure our saved model path still contains a valid model.
         if pathHasValidModel(modelPathUrl) {
+            logger.debug("Using configured model path \(modelPath)")
             return modelPathUrl.rawPath
         }
 
@@ -142,17 +146,17 @@ func getModelPath() -> String {
 
     // Let's iterate through all possible framework locations.
     let possibleLocations = getFrameworkPaths()
-    print("Checking possible locations: \(possibleLocations)")
+    logger.debug("Checking possible model locations: \(possibleLocations)")
 
     // Attempt to find a default.
     let fileManager = FileManager.default
     for frameworkLocation in possibleLocations {
         // First, let's ensure this framework's directory exists.
-        print("Checking \(frameworkLocation)")
+        logger.debug("Checking for models in framework \(frameworkLocation)")
         guard frameworkLocation.exists() else {
             continue
         }
-        print("Checking framework location \(frameworkLocation)...")
+        logger.debug("Checking framework location \(frameworkLocation)...")
 
         // In older iOS, watchOS, tvOS, [...] versions, the model is located directly within the framework.
         if pathHasValidModel(frameworkLocation) {
@@ -163,7 +167,7 @@ func getModelPath() -> String {
         do {
             try fileManager.contentsOfDirectory(at: frameworkLocation, includingPropertiesForKeys: [.isDirectoryKey])
         } catch let e {
-            print("uhh \(e)")
+            logger.error("Encountered an error while searching framework directory: \(e)")
         }
 
         // In at least iOS 17.4 and later, the model resides within a subdirectory.
@@ -180,7 +184,7 @@ func getModelPath() -> String {
                 continue
             }
 
-            print("Checking subdirectory \(contentLocation)")
+            logger.debug("Checking framework subdirectory \(contentLocation)")
 
             // Ensure this directory has a model.
             if pathHasValidModel(contentLocation) {
